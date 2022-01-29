@@ -1,0 +1,103 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+.header {
+    background-color: blue !important;
+
+    font-size: 1.10rem;
+    padding: 5px;
+    color: white;
+    font-weight: bold;
+}
+
+.navbar {
+    background-color: #007BFF !important;
+
+    color: white !important;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E") !important;
+  }
+
+.nav-item {
+    color: white !important;
+}
+
+.navbar-brand-shine {
+    font-size: 1.2rem !important;
+    background-color: blue;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+
+.input-container {
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    padding: 20px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+#saveForm > button {
+    float: right;
+    margin-left: 5px;
+}
+
+.required-field::after {
+    content: "*";
+    color: red;
+}
+
+
+.year > td {
+    background-color: #007BFF;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem
+}
+
+.totaldripbg {
+    background-color: #FFFF00 !important;
+    color: black
+}
+
+.portfoliobg {
+    background-color: #FFC000 !important;
+    color: black
+}
+
+.portfolioq4bg {
+    background-color: #ff781f !important; 
+    color: black
+}
+
+.percentbg {
+    background-color: #CCFF66 !important;
+    color: #006600;
+}
+
+
+.wodrip {
+    background-color: #28A745 !important;
+    color: white
+}
+.wdrip {
+    background-color: #006400 !important;
+    color: white;
+}
+
+td:nth-child(2), td:nth-child(3) {
+    text-align: center;
+}  
+
+button {
+    padding: 5px !important;
+}
+
+#addFundsButton {
+    color: white;
+}

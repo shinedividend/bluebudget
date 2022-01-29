@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" media="all">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}" media="all">
+    <script src="https://kit.fontawesome.com/d31cc9069e.js" crossorigin="anonymous"></script>
+    <title>FINANCE MANAGER</title>
+</head>
+<body>
+    <div class="header">
+        Shine's Budget Dividend & Retirement Calculator
+        <span id="date"></span>
+        <span id="time" style="background-color: yellow; color: black; border-radius: 5px; padding: 3px;"></span>
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light p-2 fw-bold">
+        <a class="navbar-brand navbar-brand-shine fs-2 mb-1 text-white">Shine's BDR</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#">Budget</a>
+                  </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Dividend Investment
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <li><a class="dropdown-item" href="#">Dividend Calculator</a></li>
+                  <li><a class="dropdown-item" href="#">Dividend Payout Summary</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+      </nav>
+    <div class="modal fade" id="addPortfolioModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add portolio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addPortfolioForm">
+                <div class="modal-body">
+                    <input type="text" class="form-control mb-2" name="portfolioName" id="portfolioName" placeholder="Portfolio name" required>
+                    <input type="number" class="form-control" name="deposit" id="deposit" min=1 placeholder="Cash funds" required>
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="addPortfolioButton">Add</button>
+                </div>
+            </form>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="deletePortfolioModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Remove porftolio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="deletePortfolioForm"  >
+                <div class="modal-body">
+                    <p id="toDeleteMessage"></p>
+                    <input type="hidden" id="toDeletePortfolioField" name="portfolioName" value=""/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger" id="deletePortfolioConfirmButton">Delete</button>
+                </div>
+            </form>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="addFundsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add funds</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addFundsForm"  >
+                <div class="modal-body">
+                    <input type="number" class="form-control" name="deposit" id="deposit" min=1 placeholder="Cash funds" required>
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+
+            </div>
+        </div>
+    </div>
+    <div class="input-container container">
+        <div class="row mb-2">
+            <div class="col-12">
+                <div id="saveForm">
+                    <button class="btn btn-sm btn-success" id="downloadResultBtn" type="button"><i class="fas fa-download"></i></button>    
+                    <button class="btn btn-sm btn-warning" id="printResultBtn" type="button"><i class="fas fa-print"></i></button>
+                </div>    
+            </div>
+        </div>
+        <form class="row" action="/calculate/calculator" method="post" id="calculateForm">
+            <div class="row mb-2">
+                <div class="col-12 col-sm-4 required-field">Portfolio</div>
+                <div class="col-12 col-sm-8">
+                    <div class="input-group">
+                        <select class="form-select" id="portfolios" name="portfolio" required>
+                          <option value="">Select Portfolio</option>
+                        </select>
+                        <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#addPortfolioModal">Add</button>
+                        <button class="btn btn-danger" type="button" data-bs-toggle="modal" id="deletePortfolioButton" data-bs-target="#deletePortfolioModal">Delete</button>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-12 col-sm-4"></div>
+                <div class="col-12 col-sm-8">
+                    Buying Power: <span style="color: green; margin: 0px 5px 0px 5px; font-weight: bold" id="funds">N/A</span> <a style="color: #0056b3" role="button" id="addFundsButton" data-bs-toggle="modal" data-bs-target="#addFundsModal">Add Funds</a>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-12 col-sm-4 required-field">Symbol</div>
+                <div class="col-12 col-sm-8">
+                    <input id="symbolInput" list="symbols" name="symbols" class="form-control" value="BNS.TO" class="col-sm-6 custom-select custom-select-sm" required>
+                    <datalist id="symbols">
+                    </datalist>
+                </div>
+                
+            </div>
+            <div class="row mb-2">
+                <div class="col-12 col-sm-4 required-field">Initial Investment</div>
+                <div class="col-12 col-sm-8">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="modes" id="radio1" value="cash" checked="checked">
+                        <label class="form-check-label" for="radio1">Cash</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="modes" id="radio2" value="share">
+                        <label class="form-check-label" for="radio2">Share</label>
+                      </div>
+                </div>
+            </div>
+            <div id="stockMode" style="display:none" class="row mb-2">
+                <div class="col-12 col-sm-6">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" >No. of Stocks</span>
+                        <input type="number" name="stockBuyCount" id="stockBuyCount" class="form-control">
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" >At Price $</span>
+                        <input type="number" name="stockPrice" id="stockPrice" class="form-control" step="any">
+                    </div>
+                </div>
+                
+            </div>
+            <div id="cashMode" class="row mb-2">
+                <div class="col-12 col-sm-4"></div>
+                <div class="col-12 col-sm-8">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-default">$</span>
+                        <input type="text" name="cash" id="cash" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-12 col-sm-4 required-field">Commission</div>
+                <div class="col-12 col-sm-8"><input type="number" id="commission" class="form-control" name="commission" id="" value="9.99"></div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-12 col-sm-4 required-field">Drip</div>
+                <div class="col-12 col-sm-8"><select class="form-select" name="drip" id="drip">
+                    <option value="1" selected>YES</option>
+                    <option value="0">NO</option>
+                </select></div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-12 col-sm-4 required-field">Dividend Frequency</div>
+                <div class="col-12 col-sm-8"><select class="form-select" name="frequency" id="frequency">
+                    <option value="auto" selected>Auto Calculate</option>
+                    <option value="quarterly" >Quarterly</option>
+                    <option value="yearly" >Yearly</option>
+                </select></div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-12 col-sm-4 required-field">Year</div>
+                <div class="col-12 col-sm-8"><select class="form-select" id="years" name="years" required>
+                </select></div>
+            </div>
+            <div class="row ">
+                <div class="col-4">
+                    {% if calculated == 'false' %}
+                        <button type="submit" value="buy" id="buyBtn" class="btn btn-primary" disabled><i class="fas fa-shopping-cart"></i> Buy</button>
+                    {% else %}
+                        <button type="submit" value="buy" id="buyBtn" class="btn btn-success"><i class="fas fa-shopping-cart"></i> Buy</button>
+                    {% endif %}
+                    </div>
+                <div class="col">
+                    {% if calculated == 'false' %}
+                        <button type="button" class="btn btn-success" disabled><i class="fas fa-plus"></i> Add to<i class="fas fa-caret-down"></i></button>
+                    {% else %} 
+                        <button type="button" class="btn btn-success"><i class="fas fa-plus"></i> Add to <i class="fas fa-caret-down"></i></button>
+                    {% endif %}
+                    <button type="submit" id="calculateBtn" class="btn btn-warning" disabled><i class="fas fa-caret-right"></i> Calculate</button>
+                </div>
+            </div>  
+        </form>
+        <input type="hidden" name="isCalculated" value='{{calculated}}'>
+        <input type="hidden" id="portfolioNameHidden" value="">
+    </div>
+    <div class="stockInfo container">
+        <div class="row">
+            <div class="col-12 col-lg-6">
+                {% if result is defined %}
+                    <table class="table table-sm table-bordered text-center">
+                        <tbody>
+                            <tr>
+                                <td>Company Name</td>
+                                <td>{{ result['stock_data']['name'] }}</td>
+                                <td>Beta (5Y Monthly)</td>
+                                <td>{{ result['stock_data']['beta'] }}</td> 
+                            </tr>
+                            <tr>
+                                <td>Symbol</td>
+                                <td>{{ result['stock_data']['symbol'] }}</td>
+                                <td>PE Ratio (TTM)</td>
+                                <td>{{ result['stock_data']['pe_ratio'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>Exchange</td>
+                                <td>{{ result['stock_data']['exchange'] }}</td>
+                                <td>50-Day Moving Average</td>
+                                <td>{{ result['stock_data']['fifty_day_average'] }}</td>
+                                
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Share Price</td>
+                                <td style="background-color: #FFFF00;color:red;font-weight:bold">{{'$' + result['stock_data']['price'] | string}}</td>
+                                <td>200-Day Moving Average</td>
+                                <td>{{ result['stock_data']['two_hundred_day_average'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>Dividend Frequency</td>
+                                <td>Quarterly</td>
+                                <td>Ex-Dividend Date</td>
+                                <td>{{ result['stock_data']['exdividend_date'] }}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Dividend Per Share</td>
+                                <td style="background-color: #009900; color: white">{{'$%.2f' %result['stock_data']['dividend_divided'] }}</td>
+                                <td>Payment Date</td>
+                                <td>{{ result['stock_data']['payment_date'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>Dividend Yield</td>
+                                <td>{{ result['stock_data']['dividend_yield'] }}</td>
+                                <td>52 Week Range</td>
+                                <td>{{ result['stock_data']['fifty_two_week_range'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>Dividend Growth Rate</td>
+                                <td>0</td>
+                                <td>Payout Ratio</td>
+                                <td>{{ result['stock_data']['payout_ratio'] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+            <div class="col-12 col-lg-6">
+                {% if result is defined %}
+                    <table class="table table-sm table-bordered text-center">
+                        <tbody>
+                            <tr>
+                                <td>Year</td>
+                                <td>W/O Drip</td>
+                                <td>With Drip</td>
+                                <td>Drip Share</td>
+                                <td>Total Share</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>Yearly/Monthly</td>
+                                <td>Yearly/Monthly/Quarterly</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            {% for year in result['calculation_result'].keys() %}
+                                {% if year == 1 or year % 5 == 0 %}
+                                    {% set current_year = result['calculation_result'][year] %}
+                                    {% set last_freq = current_year.keys() | length %}
+                                    <tr>
+                                        <td><a href="{{'#year'+ year | string}}">{{year}}</a></td>
+                                        <td>{{'$%.2f / $%.2f' %(current_year[last_freq]['dividend_cash_received'][0], result['calculation_result'][year][4]['dividend_cash_received'][0] / 12)}}</td>
+                                        <td>{{'$%.2f / $%.2f / $%.2f' %(current_year[last_freq]['portfolio_cash'][1], current_year[last_freq]['portfolio_cash'][1] / 12, current_year[last_freq]['portfolio_cash'][1] / 4)}}</td>
+                                        <td>{{current_year[last_freq]['total_drip_share']}}</td>
+                                        <td>{{current_year[last_freq]['total_drip'][1]}}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+        
+    </div>
+    <div class="result-info container fw-bold">
+        {% if result is defined %}
+            {% for year in result['calculation_result'].keys() %}
+                {% for freq in result['calculation_result'][year].keys() %}
+                    {% if year == 1 and freq == 1 %}
+                        <table class="table table-sm table-bordered mb-3">
+                            <tbody>
+                                <tr class="year">
+                                    <td colspan="3">{{'Year ' + year | string }}{{' %s %s' %(frequency, freq)}}</td>
+                                    
+                                </tr>                           
+                                <tr>
+                                    <td>Book Value (Initial Investment Cash {{ frequency[0] }}1)</td>
+                                    <td>{{"${:,.2f}".format(result['calculation_result'][year][1]['investment'])}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Cash Balance after Investment</td>
+                                    <td>{{"${:,.2f}".format(result['calculation_result'][year][1]['cash_balance_after_invest'])}}</td>  
+                                </tr>
+                                <tr>
+                                    <td>Initial Share Brought</td>
+                                    <td>{{result['calculation_result'][year][1]['initial_share_brought'][0]}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Average Cost</td>
+                                    <td>{{"${:,.4f}".format(result['calculation_result'][year][1]['average_cost'])}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    {% elif year == 1 and freq > 1 %}
+                        <table class="table table-sm table-bordered mb-3">
+                            <tbody>
+                                <tr class="year">
+                                    <td colspan="3">{{'Year ' + year | string }}{{' %s %s' %(frequency, freq)}}</td>
+                                </tr>
+                                <tr style="text-align: center;">
+                                    <td></td>
+                                    <td class="wodrip">W/O Drip</td>
+                                    <td class="wdrip">With Drip</td>
+                                </tr>
+                                <tr>
+                                    <td>No. of Drip Shares Received in {{ frequency[0] }}{{ freq }}</td>
+                                    <td></td>
+                                    <td>{{"%d" %result['calculation_result'][year][freq]['drip_received'] if is_drip else '0'}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Total No. of Drip Shares end of {{ frequency[0] }}{{ freq }}</td>
+                                    <td>{{result['calculation_result'][year][freq]['total_drip'][0]}}</td>
+                                    <td>{{result['calculation_result'][year][freq]['total_drip'][1] if is_drip else '0'}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Dividend-Cash Received W/O DRIP and With Drip Year 1 - Q{{freq}}</td>
+                                    <td style="background-color: blue; color: white">{{"${:,.2f}".format(result['calculation_result'][year][freq]['dividend_cash_received'][0])}}</td>
+                                    <td>{{"${:,.2f}".format(result['calculation_result'][year][freq]['dividend_cash_received'][1]) if is_drip else '0'}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Cash received from Drip Shares in Year 1 - {{ frequency[0] + freq | string }}</td>
+                                    <td></td>
+                                    <td>{{'${:,.2f}'.format(result['calculation_result'][year][freq]['cash_received_drip']) if is_drip else '0'}}</td>
+                                </tr>
+                                {% if loop.last %}
+                                    <tr>
+                                        <td>Total Cash Received from Drip Shares / Total Cash Received after drip</td>
+                                        <td>{{"${:,.2f}".format(result['calculation_result'][year][freq]['total_cash_received'][0])}}</td>
+                                        <td>{{"${:,.2f}".format(result['calculation_result'][year][freq]['total_cash_received'][1]) if is_drip else '0'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Portfolio Unrealized Gain/Loss</td>
+                                        <td class="percentbg">{{ result['calculation_result'][year][freq]['portfolio_gain_loss'][0] }}</td>
+                                        <td class="percentbg">{{ result['calculation_result'][year][freq]['portfolio_gain_loss'][1] if is_drip else '0' }}</td>
+                                    </tr>
+                                {% endif %}  
+                                <tr>
+                                    <td>Portfolio Cash W/O DRIP   and With Drip {{ frequency[0] }}{{ freq }} end of Year {{year}} - {{ frequency[0] }}{{ freq }}</td>
+                                    <td class="portfoliobg">{{"${:,.2f}".format(result['calculation_result'][year][freq]['portfolio_cash'][0])}}</td>
+                                    <td style="background-color: yellow">{{"${:,.2f}".format(result['calculation_result'][year][freq]['portfolio_cash'][1]) if is_drip else '0'}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    {% elif year > 1 %}
+                        <table class="table table-sm table-bordered mb-3" id="{{'year' + year | string if loop.last else ''}}">
+                            <tbody>
+                                <tr class="year">
+                                    <td colspan="3">{{'Year ' + year | string }}{{' %s %s' %(frequency, freq)}}</td>
+                                </tr>
+                                <tr style="text-align: center;">
+                                    <td></td>
+                                    <td class="wodrip">W/O Drip</td>
+                                    <td class="wdrip">With Drip</td>
+                                </tr>
+                                <tr>
+                                    <td>No. of Drip Shares Received in {{ frequency[0] }}{{ freq }}</td>
+                                    <td></td>
+                                    <td>{{"%d" %result['calculation_result'][year][freq]['drip_received'] if is_drip else '0'}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Total No. of Drip Shares end of {{ frequency[0] }}{{ freq }}</td>
+                                    <td>{{result['calculation_result'][year][freq]['total_drip'][0]}}</td>
+                                    <td>{{result['calculation_result'][year][freq]['total_drip'][1] if is_drip else '0'}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Dividend-Cash Received W/O DRIP and With Drip Year 1 - Q{{freq}}</td>
+                                    <td style="background-color: blue; color: white">{{"${:,.2f}".format(result['calculation_result'][year][freq]['dividend_cash_received'][0])}}</td>
+                                    <td>{{"${:,.2f}".format(result['calculation_result'][year][freq]['dividend_cash_received'][1]) if is_drip else '0'}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Cash received from Drip Shares in Year 1 - {{ frequency[0] + freq | string }}</td>
+                                    <td></td>
+                                    <td>{{'$%.2f' %result['calculation_result'][year][freq]['cash_received_drip'] if is_drip else '0'}}</td>
+                                </tr>
+                                {% if loop.last %}
+                                    <tr>
+                                        <td>Total Cash Received from Drip Shares / Total Cash Received after drip</td>
+                                        <td>{{"${:,.2f}".format(result['calculation_result'][year][freq]['total_cash_received'][0])}}</td>
+                                        <td>{{"${:,.2f}".format(result['calculation_result'][year][freq]['total_cash_received'][1]) if is_drip else '0'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Portfolio Unrealized Gain/Loss</td>
+                                        <td class="percentbg">{{ result['calculation_result'][year][freq]['portfolio_gain_loss'][0] }}</td>
+                                        <td class="percentbg">{{ result['calculation_result'][year][freq]['portfolio_gain_loss'][1] if is_drip else '0' }}</td>
+                                    </tr>
+                                {% endif %}  
+                                <tr>
+                                    <td>Portfolio Cash W/O DRIP   and With Drip {{ frequency[0] }}{{ freq }} end of Year {{year}} - {{ frequency[0] }}{{ freq }}</td>
+                                    <td class="portfoliobg">{{"${:,.2f}".format(result['calculation_result'][year][freq]['portfolio_cash'][0])}}</td>
+                                    <td style="background-color: yellow;">{{"${:,.2f}".format(result['calculation_result'][year][freq]['portfolio_cash'][1]) if is_drip else '0'}}</td>
+                                </tr>
+                                  
+                            </tbody>
+                        </table>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+    </div>
+    <input type="hidden" id="errorMessage" name="errorMessage" value="{{'' if error_message is not defined else error_message}}">
+    <input type="hidden" id="isCalculated" name="isCalculated" value="{{'false' if calculated is not defined else calculated}}">
+    <input type="hidden" id="prevPortfolio" value="{{'' if prev_form is not defined else prev_form['portfolio']}}">
+    <input type="hidden" id="prevFunds" value="{{'' if prev_form is not defined else prev_form['funds']}}">
+    <input type="hidden" id="prevSymbol" value="{{'' if prev_form is not defined else prev_form['symbols']}}">
+    <input type="hidden" id="prevMode" value="{{'' if prev_form is not defined else prev_form['modes']}}">
+    <input type="hidden" id="prevCash" value="{{'' if prev_form is not defined else prev_form['cash']}}">
+    <input type="hidden" id="prevStockPrice" value="{{'' if prev_form is not defined else prev_form['stockPrice']}}">
+    <input type="hidden" id="prevStockBuyCount" value="{{'' if prev_form is not defined else prev_form['stockBuyCount']}}">
+    <input type="hidden" id="prevCommission" value="{{'' if prev_form is not defined else prev_form['commission']}}">
+    <input type="hidden" id="prevYear" value="{{'' if prev_form is not defined else prev_form['years']}}">
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
+    <script src="{{url_for('static', filename='index.js')}}"></script>
+    <script>
+        document.getElementById('downloadResultBtn').addEventListener('click', (event) => {
+            console.log('clicked')
+            if (document.getElementById('isCalculated') == 'false') {
+                alert('Calculate first before downloading the file.')
+            }
+            else {
+                var csvContent = "data:text/csv;charset=utf-8," + `{{ csv | safe }}`
+                var encodedUri = encodeURI(csvContent)
+                var link = document.createElement('a')
+                link.setAttribute('href', encodedUri)
+                link.setAttribute('download', 'result.csv')
+                document.body.appendChild(link)
+                link.click()
+            }
+        })
+
+        document.getElementById('printResultBtn').addEventListener('click', (event) => {
+            window.print()
+        })
+    </script>
+
+</body>
+</html>
